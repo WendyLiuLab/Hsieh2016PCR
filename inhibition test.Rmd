@@ -1,0 +1,57 @@
+---
+title: "Inhibition check"
+author: "Tim D. Smith"
+date: "September 4, 2016"
+output: html_document
+---
+
+The purpose of this experiment was to establish a dilution of the cDNA that would allow us to perform RT-qPCR without inhibition. The sample was the 4h, mouse 1, M0 condition. 2-fold dilutions were prepared from 1:2 to 1:128. Dilutions were prepared separately in each of the 1st and 2nd columns.
+
+The dilution method was, in retrospect, very optimistic; two-fold dilutions were made by mixing 2.5 µl of water with 2.5 µl of the previous product. This was probably not enough volume to yield a good dilution curve.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(reshape2)
+library(stringr)
+
+cqs = read_csv("raw-data/inhibition_check/admin_2016-09-04 16-12-03_CC011664 -  Quantification Summary_0.csv") %>%
+  select(-X1)
+melts = read_csv("raw-data/inhibition_check/admin_2016-09-04 16-12-03_CC011664 -  Melt Curve Derivative Results_SYBR.csv") %>%
+  select(-X1) %>%
+  melt(id.vars="Temperature", variable.name="Well")
+```
+
+We can verify that GAPDH is the entity that was amplified by plotting melt curves. The melt curves all overlap; the stragglers at the bottom are the NTCs, indicating an unimportant level of contamination. This means that inhibition is not shifting the binding kinetics to prefer an unintended product for the GAPDH probe.
+
+```{r melt_curve}
+g = ggplot(melts, aes(Temperature, value, color=Well)) +
+  geom_line(alpha=0.7) +
+  theme_bw()
+print(g)
+```
+
+We expect the Cq to increase by 1 cycle for each two-fold dilution. Plotting the number of dilutions by the Cq, we see that neither has a slope of 1, but also that the slope of the curve doesn't change very much as a function of _x_. This suggests that we don't see severe inhibition in the less dilute samples.
+
+```{r lineplot}
+re = "([A-H])([0-9]+)"
+matches = str_match(cqs$Well, re)
+cqs$Row = matches[,2]
+cqs$Col = as.numeric(matches[,3])
+row_lookup = c(A=1,B=2,C=3,D=4,E=5,F=6,G=7,H=8)
+
+g = cqs %>%
+  filter(Row != "A") %>%
+  transform(row_number = row_lookup[Row]) %>%
+  ggplot(aes(row_number-1, Cq, color=as.factor(Col))) +
+    geom_point() +
+    geom_line() +
+    geom_abline(slope=1, intercept=18) +
+    theme_bw()
+print(g)
+```
+
+Conclusion: for experimental convenience, dilute samples 1:10 prior to performing qPCR.

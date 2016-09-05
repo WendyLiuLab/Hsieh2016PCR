@@ -1,0 +1,39 @@
+---
+title: "Overall"
+author: "Tim D. Smith"
+date: "September 4, 2016"
+output:
+  html_document:
+    dev: pdf
+    self_contained: false
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(reshape2)
+
+devtools::load_all(".")
+
+df = load_all_cqs() %>%
+  fold_vs_gapdh()
+```
+
+```{r semplots, fig.width=4, fig.height=6}
+# squash PCR replicates first
+squashed = df %>%
+  group_by(Target, Timepoint, Condition, Mouse) %>%
+  summarize(FoldVsGapdh=mean(FoldVsGapdh))
+
+for(time in unique(squashed$Timepoint)) {
+  g = squashed %>%
+    filter(Timepoint == time) %>%
+    ggplot(aes(Condition, FoldVsGapdh)) +
+      facet_grid(Target~Timepoint, scales="free") +
+      stat_summary(fun.data=mean_se) +
+      # ggtitle(time) +
+      theme_bw()
+  print(g)
+}
+```
