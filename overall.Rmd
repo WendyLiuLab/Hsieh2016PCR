@@ -17,23 +17,31 @@ library(reshape2)
 devtools::load_all(".")
 
 df = load_all_cqs() %>%
-  fold_vs_gapdh()
+  fold_vs_gapdh() %>%
+  filter(Timepoint == "4h")
+
+by_mouse = df %>%
+  group_by(Target, Timepoint, Condition, Mouse) %>%
+  summarize(FoldVsGapdh=mean(FoldVsGapdh, na.rm=TRUE)) %>%
+  filter(!is.na(FoldVsGapdh))
 ```
 
 ```{r semplots, fig.width=4, fig.height=6}
-# squash PCR replicates first
-squashed = df %>%
-  group_by(Target, Timepoint, Condition, Mouse) %>%
-  summarize(FoldVsGapdh=mean(FoldVsGapdh))
+g = ggplot(by_mouse, aes(Condition, FoldVsGapdh)) +
+  facet_wrap(~Target, ncol=2, scales="free") +
+  stat_summary(fun.data=mean_se) +
+  theme_bw() +
+  theme(axis.text.x=element_text(angle=40, hjust=1))
+print(g)
+```
 
-for(time in unique(squashed$Timepoint)) {
-  g = squashed %>%
-    filter(Timepoint == time) %>%
-    ggplot(aes(Condition, FoldVsGapdh)) +
-      facet_grid(Target~Timepoint, scales="free") +
-      stat_summary(fun.data=mean_se) +
-      # ggtitle(time) +
-      theme_bw()
-  print(g)
-}
+```{r barplots, fig.width=7, fig.height=8}
+g = ggplot(by_mouse, aes(Condition, FoldVsGapdh)) +
+  facet_wrap(~Target, ncol=2, scales="free") +
+  stat_summary(fun.data=mean_se, geom="bar", width=0.8) +
+  stat_summary(fun.data=mean_se, geom="errorbar", width=0.5) +
+  labs(y="Fold expression vs Gapdh") +
+  theme_bw() +
+  theme(axis.text.x=element_text(size=8))
+print(g)
 ```
