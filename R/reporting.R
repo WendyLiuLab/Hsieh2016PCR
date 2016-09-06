@@ -6,7 +6,7 @@ load_cqs = function(gene) {
 }
 
 load_all_cqs = function() {
-  genes = c("arg1", "il10", "nos2", "tnfa", "mrc1-tgfb1", "chi3l3-retnla")
+  genes = c("arg1", "il10", "nos2", "tnfa", "mrc1-tgfb1", "chi3l3-retnla", "kdm6b-ntcs")
   df = genes %>%
     lapply(load_cqs) %>%
     bind_rows
@@ -23,5 +23,7 @@ load_all_cqs = function() {
 
   df %>%
     split_plate("Mrc1-Tgfb1") %>%
-    split_plate("Chi3l3-Retnla")
+    split_plate("Chi3l3-Retnla") %>%
+    split_plate("Kdm6b-Ntcs") %>%
+    filter(Target != "Ntcs")
 }

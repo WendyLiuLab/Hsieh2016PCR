@@ -35,7 +35,7 @@ g = ggplot(by_mouse, aes(Condition, FoldVsGapdh)) +
 print(g)
 ```
 
-```{r barplots, fig.width=7, fig.height=8}
+```{r barplots, fig.width=7, fig.height=10}
 g = ggplot(by_mouse, aes(Condition, FoldVsGapdh)) +
   facet_wrap(~Target, ncol=2, scales="free") +
   stat_summary(fun.data=mean_se, geom="bar", width=0.8) +
