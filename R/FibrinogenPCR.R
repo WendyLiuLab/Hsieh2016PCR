@@ -8,14 +8,14 @@ annotations = function(zero_pad=TRUE) {
   
   # row-indexed
   conditions = c(
-    "m0",
-    "fb",
-    "fb+fg",
-    "fg",
-    "lps",
-    "m1",
-    "m2",
-    "m2l"
+    "Control",
+    "F",
+    "F+Fg",
+    "Fg",
+    "L",
+    "L+I",
+    "4+13",
+    "L+4+13"
   )
   names(conditions) = rows
   
@@ -27,6 +27,11 @@ annotations = function(zero_pad=TRUE) {
       Timepoint=timepoint[Col],
       Mouse=mouse[Col],
       Condition=conditions[Row]
+    ) %>%
+    mutate(
+      Condition=factor(Condition,
+        c("Control", "F", "F+Fg", "Fg",
+          "L", "L+I", "4+13", "L+4+13"))
     )
 }
 
