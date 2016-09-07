@@ -27,3 +27,15 @@ load_all_cqs = function() {
     split_plate("Kdm6b-Ntcs") %>%
     filter(Target != "Ntcs")
 }
+
+heatmap = function(plot_matrix, col=c(), ...) {
+  if(length(col) == 0) {
+    col = viridis::viridis(128)
+  }
+  gplots::heatmap.2(plot_matrix,
+                    col=col,
+                    srtCol=30,
+                    trace="none",
+                    denscol="black",
+                    ...)
+}
