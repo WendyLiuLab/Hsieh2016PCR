@@ -9,7 +9,9 @@ output:
 ---
 
 ```{r setup, include=FALSE}
+library(plyr)
 library(dplyr)
+library(gplots)
 library(ggplot2)
 library(readr)
 library(reshape2)
@@ -24,6 +26,10 @@ by_mouse = df %>%
   group_by(Target, Timepoint, Condition, Mouse) %>%
   summarize(FoldVsGapdh=mean(FoldVsGapdh, na.rm=TRUE)) %>%
   filter(!is.na(FoldVsGapdh))
+
+by_condition = df %>%
+  group_by(Target, Timepoint, Condition) %>%
+  summarize(FoldVsGapdh=mean(FoldVsGapdh, na.rm=TRUE))
 ```
 
 ```{r semplots, fig.width=4, fig.height=6}
@@ -44,4 +50,20 @@ g = ggplot(by_mouse, aes(Condition, FoldVsGapdh)) +
   theme_bw() +
   theme(axis.text.x=element_text(size=8))
 print(g)
+```
+
+```{r heatmap}
+map_array = acast(by_mouse, Condition~Target, value.var="FoldVsGapdh", subset=.(Timepoint == "4h"), fun.aggregate=mean)
+#heatmap(map_array)
+
+#maxnorm = function(x) x/max(x)
+#col_normed = apply(map_array, 2, maxnorm)
+#heatmap(col_normed)
+
+heatmap(map_array, scale="col")
+```
+
+```{r pca, fig.height=4, fig.width=4}
+my_pca = prcomp(map_array, scale.=TRUE)
+biplot(my_pca)
 ```
