@@ -52,14 +52,19 @@ g = ggplot(by_mouse, aes(Condition, FoldVsGapdh)) +
 print(g)
 ```
 
+```{r statistics}
+for(target in unique(by_mouse$Target)) {
+  paste("\n****", target, "\n") %>% cat
+  conditions = c("Control", "F", "Fg", "F+Fg")
+  fit = aov(FoldVsGapdh~Condition, by_mouse, subset=by_mouse$Target == target & by_mouse$Condition %in% conditions)
+  summary(fit) %>% print
+  hsd = TukeyHSD(fit)
+  print(hsd$Condition[hsd$Condition[,"p adj"] < 0.05,])
+}
+```
+
 ```{r heatmap}
-map_array = acast(by_mouse, Condition~Target, value.var="FoldVsGapdh", subset=.(Timepoint == "4h"), fun.aggregate=mean)
-#heatmap(map_array)
-
-#maxnorm = function(x) x/max(x)
-#col_normed = apply(map_array, 2, maxnorm)
-#heatmap(col_normed)
-
+map_array = acast(by_mouse, Condition~Target, value.var="FoldVsGapdh", subset=.(Timepoint == "4h" & Condition != "L"), fun.aggregate=mean)
 heatmap(map_array, scale="col")
 ```
 
