@@ -5,21 +5,21 @@ load_cqs = function(gene) {
     mutate(Target=stringr::str_to_title(gene))
 }
 
+split_plate = function(df, target) {
+  targets = stringr::str_split_fixed(target, "-", 2) %>%
+    sapply(stringr::str_to_title)
+  within(df, {
+    Target[Target == target & Timepoint == "4h"] = targets[1]
+    Target[Target == target & Timepoint == "24h"] = targets[2]
+    Timepoint[Target == targets[2]] = "4h"
+  })
+}
+
 load_all_cqs = function() {
   genes = c("arg1", "il10", "nos2", "tnfa", "mrc1-tgfb1", "chi3l3-retnla", "kdm6b-ntcs")
   df = genes %>%
     lapply(load_cqs) %>%
     bind_rows
-
-  split_plate = function(df, target) {
-    targets = stringr::str_split_fixed(target, "-", 2) %>%
-      sapply(stringr::str_to_title)
-    within(df, {
-      Target[Target == target & Timepoint == "4h"] = targets[1]
-      Target[Target == target & Timepoint == "24h"] = targets[2]
-      Timepoint[Target == targets[2]] = "4h"
-    })
-  }
 
   df %>%
     split_plate("Mrc1-Tgfb1") %>%
