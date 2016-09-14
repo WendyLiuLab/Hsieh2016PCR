@@ -27,7 +27,7 @@ by_mouse = df %>%
   summarize(FoldVsGapdh=mean(FoldVsGapdh, na.rm=TRUE)) %>%
   filter(!is.na(FoldVsGapdh))
 
-by_condition = df %>%
+by_condition = by_mouse %>%
   group_by(Target, Timepoint, Condition) %>%
   summarize(FoldVsGapdh=mean(FoldVsGapdh, na.rm=TRUE))
 ```
