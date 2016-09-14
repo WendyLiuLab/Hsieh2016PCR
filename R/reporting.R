@@ -5,7 +5,7 @@ load_cqs = function(gene) {
     mutate(Target=stringr::str_to_title(gene))
 }
 
-load_melts = function(gene) {
+load_melt_curves = function(gene) {
   readr::read_csv(paste0("raw-data/", gene, "/2016-09-04 ", gene, " -  Melt Curve Derivative Results_SYBR.csv")) %>%
     select(-X1) %>%
     reshape2::melt(id.vars="Temperature", variable.name="Well", value.name="dF") %>%
@@ -28,6 +28,19 @@ load_all_cqs = function() {
   genes = c("arg1", "il10", "nos2", "tnfa", "mrc1-tgfb1", "chi3l3-retnla", "kdm6b-ntcs")
   df = genes %>%
     lapply(load_cqs) %>%
+    bind_rows
+
+  df %>%
+    split_plate("Mrc1-Tgfb1") %>%
+    split_plate("Chi3l3-Retnla") %>%
+    split_plate("Kdm6b-Ntcs") %>%
+    filter(Target != "Ntcs")
+}
+
+load_all_melt_curves = function() {
+  genes = c("arg1", "il10", "nos2", "tnfa", "mrc1-tgfb1", "chi3l3-retnla", "kdm6b-ntcs")
+  df = genes %>%
+    lapply(load_melt_curves) %>%
     bind_rows
 
   df %>%
