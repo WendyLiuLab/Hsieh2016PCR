@@ -5,6 +5,15 @@ load_cqs = function(gene) {
     mutate(Target=stringr::str_to_title(gene))
 }
 
+load_melts = function(gene) {
+  readr::read_csv(paste0("raw-data/", gene, "/2016-09-04 ", gene, " -  Melt Curve Derivative Results_SYBR.csv")) %>%
+    select(-X1) %>%
+    reshape2::melt(id.vars="Temperature", variable.name="Well", value.name="dF") %>%
+    select(Well, Temperature, dF) %>%
+    inner_join(annotations(zero_pad=FALSE)) %>%
+    mutate(Target=stringr::str_to_title(gene))
+}
+
 split_plate = function(df, target) {
   targets = stringr::str_split_fixed(target, "-", 2) %>%
     sapply(stringr::str_to_title)
