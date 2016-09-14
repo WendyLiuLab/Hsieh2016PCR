@@ -1,10 +1,17 @@
 Package: FibrinogenPCR
-Title: What the Package Does (one line, title case)
+Title: PCR data analysis for Hsieh 2006
 Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Authors@R: person("Tim", "Smith", email = "tim.smith@uci.edu", role = c("aut", "cre"))
+Description: PCR data analysis for Hsieh 2006
 Depends: R (>= 3.3.1),
     dplyr
-License: What license is it under?
+License: MIT + LICENSE
 Encoding: UTF-8
 LazyData: true
+Imports: reshape2,
+    readr,
+    stringr,
+    viridis,
+    gplots,
+    devtools
+Suggests: ggplot2

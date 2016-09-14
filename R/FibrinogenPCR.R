@@ -38,7 +38,7 @@ annotations = function(zero_pad=TRUE) {
 average_cq = function(x) log2(length(x)/sum(2**-x))
 
 gapdh = function() {
-  read_csv("raw-data/gapdh/2016-09-04 gapdh -  Quantification Cq Results_0.csv") %>%
+  readr::read_csv("raw-data/gapdh/2016-09-04 gapdh -  Quantification Cq Results_0.csv") %>%
     select(Well, Cq) %>%
     inner_join(annotations()) %>%
     group_by(Timepoint, Mouse, Condition) %>%
