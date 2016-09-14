@@ -1,0 +1,48 @@
+---
+title: "Results per gene"
+author: "Tim D. Smith"
+date: "September 4, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(reshape2)
+
+devtools::load_all(".")
+
+cqs = load_all_cqs()
+melts = load_all_melt_curves()
+```
+
+```{r output, warning=FALSE, message=FALSE}
+for(target in unique(cqs$Target)) {
+  cat(paste0("\n\n", target, " --------------------------"))
+  target.cqs = cqs %>% filter(Target == target)
+  target.melts = melts %>% filter(Target == target)
+  
+  g = ggplot(target.melts, aes(Temperature, dF, color=as.factor(Col))) +
+    facet_wrap(~Condition) +
+    geom_line(alpha=0.7) +
+    theme_bw()
+  print(g)
+  
+  g = ggplot(target.cqs, aes(Condition, Cq, color=Mouse)) +
+    geom_point() +
+    facet_grid(Timepoint~.) +
+    theme_bw()
+  print(g)
+  
+  g = target.cqs %>%
+    fold_vs_gapdh %>%
+      ggplot(aes(Condition, FoldVsGapdh, color=Mouse)) +
+      geom_point() +
+      facet_grid(Timepoint~., scales="free_y") +
+      theme_bw()
+  print(g)
+}
+```
